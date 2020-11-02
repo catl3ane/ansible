@@ -1,0 +1,20 @@
+    8  sudo mdadm --create --verbose /dev/md13 --level=1 --raid-devices=2 /dev/sda /dev/sdb
+    9  cat /proc/mdstat
+   10  sudo mkfs.ext4 -F /dev/md13
+   11  sudo mkdir -p /home/virt4
+   13  sudo mount /dev/md13 /home/virt4
+   
+
+   16  df -h -x devtmpfs -x tmpfs
+   17  sudo mdadm --detail --scan | sudo tee -a /etc/mdadm/mdadm.conf
+   19  mdadm --detail --scan | sudo tee -a /etc/mdadm/mdadm.conf
+   20  sudo update-initramfs -u
+   22  echo '/dev/md13 /home/virt4 ext4 defaults,nofail,discard 0 0' | sudo tee -a /etc/fstab
+
+
+   84  cryptsetup -c aes-cbc-essiv:sha256 -y -s 256 luksFormat /dev/md13
+  112  cryptsetup luksOpen /dev/md13 md13_crypt
+   93  mkfs -t ext4 /dev/mapper/md13_crypt 
+   92  mount /dev/mapper/md13_crypt /home/virt4
+  116  update-initramfs -u
+  126  lsblk -o name,uuid,mountpoint
